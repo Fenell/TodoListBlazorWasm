@@ -1,7 +1,35 @@
 ﻿@page "/todoList"
 
-<h3>TodoList @name</h3>
-
-@code {
-	string name = "Fenell";
+@if (jobDtos == null)
+{
+	<div><em>Loading...</em></div>
 }
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">Name</th>
+				<th scope="col">AssigneeName</th>
+				<th scope="col">CreatedDate</th>
+				<th scope="col">Priority</th>
+				<th scope="col">Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var job in jobDtos)
+			{
+				<tr>
+					<td>@job.Name</td>
+					<td>@job.AssigneeName</td>
+					<td>@job.CreatedDate.ToString("dd/MM/yyyy hh:mm")</td>
+					<td>@job.Priority</td>
+					<td>@job.Status</td>
+				</tr>
+
+			}
+		</tbody>
+	</table>
+}
+
+
