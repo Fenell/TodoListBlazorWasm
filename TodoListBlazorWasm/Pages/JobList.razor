@@ -1,0 +1,69 @@
+﻿@page "/job-list"
+@using TodoListBlazorWasm.Components
+@using TodoListBlazorWasm.Pages.Components
+@if (jobDtos == null || userDtos == null)
+{
+	<MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+	<div class=" row">
+		<JobSearch OnSearch="SearchJob"></JobSearch>
+	</div>
+	<div class="mt-5">
+		<h2>Job list</h2>
+		<MudTable Items="jobDtos" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+			<HeaderContent>
+				<MudTh>Name</MudTh>
+				<MudTh>Assign Name</MudTh>
+				<MudTh>Created Date</MudTh>
+				<MudTh>Priority</MudTh>
+				<MudTh>Status</MudTh>
+				<MudTh>Action</MudTh>
+			</HeaderContent>
+			<RowTemplate>
+				<MudTd DataLabel="Name">@context.Name</MudTd>
+				<MudTd DataLabel="Assign Name">
+					<MudLink OnClick="() => OpenDialog(context.Id)">@context.AssigneeName</MudLink>
+				</MudTd>
+				<MudTd DataLabel="Created Date">@context.CreatedDate.ToString("dd/MM/yyyy hh:mm")</MudTd>
+				<MudTd DataLabel="Priority">
+					<PriorityLabel Priority="@context.Priority"></PriorityLabel>
+				</MudTd>
+				<MudTd DataLabel="Status">
+					<StatusLabel Status="@context.Status"></StatusLabel>
+				</MudTd>
+				<MudTd DataLabel="Action">
+					<a class="btn btn-success" href="/job-update/@context.Id">Cập nhật</a>
+					<a class="btn btn-warning" href="/job-detail/@context.Id">Chi tiết</a>
+					<MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="() => OnButtonClicked(context.Id)">Delete</MudButton>
+				</MudTd>
+			</RowTemplate>
+			<PagerContent>
+				<MudPagination SelectedChanged="PageChanged" Count="MetaData.TotalPage" Class="pa-4"></MudPagination>
+			</PagerContent>
+		</MudTable>
+
+
+	</div>
+
+	<MudDialog @bind-IsVisible="visible" Options="dialogOptions">
+		<TitleContent>
+			<h5>Chọn người giao</h5>
+		</TitleContent>
+		<DialogContent>
+			<MudSelect T="string" @bind-Value="assignId" Label="Người giao" AnchorOrigin="Origin.BottomCenter">
+				@foreach (var item in userDtos)
+				{
+					<MudSelectItem Value="item.Id.ToString()">@item.FullName</MudSelectItem>
+				}
+			</MudSelect>
+		</DialogContent>
+		<DialogActions>
+			<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="UpdateAssignJob">Ok</MudButton>
+		</DialogActions>
+	</MudDialog>
+
+}
+
+

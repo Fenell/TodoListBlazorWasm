@@ -1,0 +1,70 @@
+﻿@using Microsoft.AspNetCore.Components
+@using TodoList.ViewModel.Enums
+@using TodoList.ViewModel.Jobs
+@using TodoListBlazorWasm.Services
+@using TodoList.ViewModel
+
+<h3>JobSearch</h3>
+@if (userDtos == null)
+{
+	<LoadingIndicator></LoadingIndicator>
+}
+else
+{
+	<div>
+		<div class="row">
+			<EditForm Model="jobSearch" OnSubmit="FromSearch">
+				<div class="row">
+					<div class="col-2">
+						<label>Name</label>
+						<InputText class="form-control" @bind-Value="jobSearch.Name" />
+					</div>
+					<div class="col-2">
+						<label>Asignee Name</label>
+						<InputSelect class="form-select" @bind-Value="jobSearch.AsigneeId">
+							<option>Select a Asignee Name</option>
+							@foreach (var item in userDtos)
+							{
+								<option value="@item.Id">@item.FullName</option>
+							}
+						</InputSelect>
+					</div>
+					<div class="col-2">
+						<label>Priority</label>
+						<InputSelect class="form-select" @bind-Value="jobSearch.Priority">
+							<option>Select a Priority</option>
+							@foreach (var item in Enum.GetNames(typeof(Priority)))
+							{
+								<option value="@item">@item</option>
+							}
+						</InputSelect>
+					</div>
+					<div class="col-2">
+						<button class="btn btn-success"><i class="fa-thin fa-circle-info"></i>Search</button>
+						<a href="job-create" type="submit" class="btn btn-success">Create</a>
+						<button type="submit" class="btn btn-danger" onclick="window.location.href='/job-list'">Refresh</button>
+					</div>
+
+				</div>
+			</EditForm>
+		</div>
+	</div>
+}
+@code {
+	[Inject] private IUserApiClient UserApiClient { get; set; }
+	[Parameter]
+	public EventCallback<JobListSearch> OnSearch { get; set; }
+
+	private List<UserDto>? userDtos;
+	private JobListSearch jobSearch = new JobListSearch();
+
+	protected override async Task OnInitializedAsync()
+	{
+		userDtos = await UserApiClient.GetUserList();
+	}
+
+	private async Task FromSearch(EditContext context)
+	{
+		await OnSearch.InvokeAsync(jobSearch);
+	}
+}

@@ -1,0 +1,49 @@
+﻿@page "/job-create"
+@using TodoList.ViewModel.Enums
+@using TodoListBlazorWasm.Components
+
+<h3>JobCreate</h3>
+@if (userDtos == null)
+{
+	<LoadingIndicator></LoadingIndicator>
+}
+else
+{
+	<EditForm Model="jobCreate" OnValidSubmit="SubmitJob">
+		<DataAnnotationsValidator/>
+		<div class="row mb-3">
+			<label class="col-sm-2 col-form-label">Name</label>
+			<div class="col-sm-10">
+				<InputText class="form-control" @bind-Value="jobCreate.Name"></InputText>
+				<ValidationMessage For="() => jobCreate.Name"></ValidationMessage>
+			</div>
+		</div>
+		<div class="row mb-3">
+			<label class="col-sm-2 col-form-label">Name</label>
+			<div class="col-sm-10">
+				<InputSelect class="form-select" @bind-Value="jobCreate.AssigneeeId">
+					<option >Select a Asignee Name</option>
+					@foreach (var item in userDtos)
+					{
+						<option value="@item.Id">@item.FullName</option>
+					}
+				</InputSelect>
+			</div>
+		</div>
+		<div class="row mb-3">
+			<label class="col-sm-2 col-form-label">Name</label>
+			<div class="col-sm-10">
+				<InputSelect class="form-select" @bind-Value="jobCreate.Priority">
+					<option>Select a Priority</option>
+					@foreach (var item in Enum.GetNames(typeof(Priority)))
+					{
+						<option value="@item">@item</option>
+					}
+				</InputSelect>
+				<ValidationMessage For="() => jobCreate.Priority"></ValidationMessage>
+			</div>
+		</div>
+		<button type="submit" class="btn btn-primary">Create job</button>
+	</EditForm>
+
+}

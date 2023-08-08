@@ -1,0 +1,54 @@
+﻿@page "/job-detail/{JobId}"
+@using TodoListBlazorWasm.Services
+@using TodoList.ViewModel
+@using TodoListBlazorWasm.Services
+@using TodoListBlazorWasm.Components
+@using TodoList.ViewModel.Jobs
+
+@inject IJobApiClient JobApiClient
+
+@if (_job == null)
+{
+	<LoadingIndicator></LoadingIndicator>
+}
+else
+{
+	<tr>
+		<td>Job name:</td>
+		<td>@_job.Name</td>
+	</tr>
+	<tr>
+		<td>Assignee Name: </td>
+		<td>@_job.AssigneeName</td>
+	</tr>
+	<tr>
+		<td>Created Date:</td>
+		<td>@_job.CreatedDate.ToString("dd/MM/yyyy hh:mm:tt")</td>
+	</tr>
+	<tr>
+		<td>Priority:</td>
+		<td>@_job.Priority</td>
+	</tr>
+	<tr>
+		<td>Status:</td>
+		<td>@_job.Status</td>
+	</tr>
+
+}
+
+@code {
+	[Parameter]
+	public string JobId { get; set; }
+
+	private JobDto? _job;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var result = await JobApiClient.GetJobById(JobId);
+		if (result.IsSuccess)
+		{
+			_job = result.Data;
+		}
+	}
+
+}

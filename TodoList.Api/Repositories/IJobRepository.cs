@@ -1,11 +1,13 @@
 ﻿using TodoList.Api.Entities;
 using TodoList.ViewModel;
+using TodoList.ViewModel.Jobs;
+using TodoListBlazorWasm;
 
 namespace TodoList.Api.Repositories
 {
-	public interface IJobRepository
+    public interface IJobRepository
 	{
-		Task<List<JobDto>> GetListAsync();
+		Task<PagedList<JobDto>> GetListAsync(JobListSearch jobSearch);
 
 		Task<JobDto> GetByIdAsync(Guid id);
 
@@ -13,6 +15,7 @@ namespace TodoList.Api.Repositories
 
 		Task<Job> UpdateAsync (JobUpdateRequest request);
 
+		Task<bool> UpdateAssignJob(Guid id, AssignJobUpdate request);
 		Task<Job> DeleteAsync (Guid id);
 	}
 }

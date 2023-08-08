@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net.WebSockets;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TodoList.Api.Entities;
 using TodoList.Api.Repositories;
-using TodoList.ViewModel;
+using TodoList.ViewModel.Jobs;
 
 namespace TodoList.Api.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class JobsController : ControllerBase
 	{
@@ -19,9 +20,9 @@ namespace TodoList.Api.Controllers
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Get()
+		public async Task<IActionResult> Get([FromQuery] JobListSearch jobSearch)
 		{
-			var jobs = await _jobRepository.GetListAsync();
+			var jobs = await _jobRepository.GetListAsync(jobSearch);
 
 			return Ok(jobs);
 		}
@@ -42,7 +43,7 @@ namespace TodoList.Api.Controllers
 		{
 			var jobs = await _jobRepository.CreateAsync(request);
 
-			return CreatedAtAction(nameof(GetById), new{jobId=jobs.Id}, jobs);
+			return CreatedAtAction(nameof(GetById), new { jobId = jobs.Id }, jobs);
 		}
 
 		[HttpPut("{jobId}")]
@@ -56,6 +57,7 @@ namespace TodoList.Api.Controllers
 
 			if (jobFromDb == null)
 				return NotFound($"Cannot find job with id: {jobId}");
+
 			if (jobId != request.Id)
 			{
 				return BadRequest("Id not match");
@@ -66,7 +68,23 @@ namespace TodoList.Api.Controllers
 			return Ok(result);
 		}
 
-		[HttpDelete]
+		[HttpPut("update-assign-job/{jobId}")]
+		public async Task<IActionResult> UpdateAsignJob(Guid jobId, [FromBody] AssignJobUpdate request)
+		{
+			var job = await _jobRepository.GetByIdAsync(jobId);
+
+			if (job == null)
+				return NotFound("Cannot find job");
+
+			var result = await _jobRepository.UpdateAssignJob(jobId, request);
+
+			if (result)
+				return Ok();
+			
+			return BadRequest();
+		}
+
+		[HttpDelete("{jobId}")]
 		public async Task<IActionResult> Delete(Guid jobId)
 		{
 			var jobFromDb = await _jobRepository.GetByIdAsync(jobId);

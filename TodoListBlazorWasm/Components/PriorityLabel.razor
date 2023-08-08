@@ -1,0 +1,19 @@
+﻿@using TodoList.ViewModel.Enums
+
+@switch (Priority)
+{
+	case Priority.Low:
+		<span><MudChip Color="Color.Secondary" Variant="Variant.Text">Low</MudChip></span>
+		break;
+	case Priority.Medium:
+		<MudChip Color="Color.Warning" Variant="Variant.Text">Medium</MudChip>
+		break;
+	case Priority.High:
+		<MudChip Color="Color.Error" Variant="Variant.Text">High</MudChip>
+		break;
+}
+
+@code {
+	[Parameter]
+	public Priority Priority { get; set; }
+}

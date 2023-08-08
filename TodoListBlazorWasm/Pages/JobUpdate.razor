@@ -1,0 +1,103 @@
+﻿@page "/job-update/{JobId}"
+@using TodoListBlazorWasm.Services
+@using Microsoft.AspNetCore.Components
+@using TodoList.ViewModel
+@using TodoList.ViewModel.Enums
+@using TodoList.ViewModel.Jobs
+
+@using TodoListBlazorWasm.Components
+
+
+@inject IToastService ToastService
+@inject IJobApiClient JobApiClient
+@inject IUserApiClient UserApiClient;
+@inject NavigationManager NavigationManager
+
+<h3>JobEdit</h3>
+@if (userDtos == null || jobDto == null)
+{
+	<LoadingIndicator></LoadingIndicator>
+}
+else
+{
+	<EditForm Model="jobUpdate" OnValidSubmit="SubmitJob">
+		<DataAnnotationsValidator />
+		<div class="row mb-3">
+			<label class="col-sm-2 col-form-label">Name</label>
+			<div class="col-sm-10">
+				<InputText class="form-control" @bind-Value="jobUpdate.Name"></InputText>
+				<ValidationMessage For="() => jobUpdate.Name"></ValidationMessage>
+			</div>
+		</div>
+		<div class="row mb-3">
+			<label class="col-sm-2 col-form-label">Name</label>
+			<div class="col-sm-10">
+				<InputSelect class="form-select" @bind-Value="jobUpdate.AssigneeeId">
+					<option>Select a Asignee Name</option>
+					@foreach (var item in userDtos)
+					{
+						<option value="@item.Id">@item.FullName</option>
+					}
+				</InputSelect>
+			</div>
+		</div>
+		<div class="row mb-3">
+			<label class="col-sm-2 col-form-label">Name</label>
+			<div class="col-sm-10">
+				<InputSelect class="form-select" @bind-Value="jobUpdate.Priority">
+					<option>Select a Priority</option>
+					@foreach (var item in Enum.GetNames(typeof(Priority)))
+					{
+						<option value="@item">@item</option>
+					}
+				</InputSelect>
+				<ValidationMessage For="() => jobUpdate.Priority"></ValidationMessage>
+			</div>
+		</div>
+		<button type="submit" class="btn btn-primary">Create job</button>
+	</EditForm>
+
+}
+@code {
+	[Parameter]
+	public string JobId { get; set; }
+	private JobDto jobDto;
+	private List<UserDto> userDtos;
+
+	JobUpdateRequest jobUpdate ;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var result = await JobApiClient.GetJobById(JobId);
+
+		if (result.IsSuccess)
+		{
+			jobDto = result.Data;
+		}
+		userDtos = await UserApiClient.GetUserList();
+		jobUpdate = new JobUpdateRequest()
+		{
+			Id = jobDto.Id,
+			Status = jobDto.Status,
+			Priority = jobDto.Priority,
+			Name = jobDto.Name,
+
+		};
+	}
+
+	async Task SubmitJob(EditContext context)
+	{
+		var result = await JobApiClient.UpdateJob(JobId, jobUpdate);
+
+		if (result.IsSuccess)
+		{
+			ToastService.ShowSuccess("cap nhat thanh cong");
+			NavigationManager.NavigateTo("/job-list");
+		}
+		else
+		{
+			ToastService.ShowError("KT lai du lieu");
+		}
+	}
+
+}

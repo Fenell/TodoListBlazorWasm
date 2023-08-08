@@ -21,12 +21,12 @@ namespace TodoList.Api.Data
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			builder.Entity<IdentityUserLogin<Guid>>().HasKey(a => a.UserId);
-			builder.Entity<IdentityUserRole<Guid>>().HasKey(x=>new{x.RoleId, x.UserId});
-			builder.Entity<IdentityUserToken<Guid>>().HasKey(x=>x.UserId);
+			builder.Entity<IdentityUserRole<Guid>>().HasKey(x => new { x.RoleId, x.UserId });
+			builder.Entity<IdentityUserToken<Guid>>().HasKey(x => x.UserId);
 			builder.Seed();
 		}
 
 		public DbSet<Job> Jobs { get; set; }
-		
+
 	}
 }
